@@ -30,6 +30,7 @@ class NewsViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         let cell = tableView.dequeueReusableCell(withIdentifier: "Post") as? PostTableViewCell
         guard let cell else { return UITableViewCell() }
+        cell.selectionStyle = .none
         cell.configure(post: post)
         return cell
     }

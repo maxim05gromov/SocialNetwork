@@ -9,13 +9,19 @@ import UIKit
 
 class ConversationsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    lazy var tableView = UITableView()
+    lazy var tableView = UITableView(frame: .zero, style: .insetGrouped)
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         tableView.dataSource = self
         tableView.delegate = self
+        view.addSubview(tableView)
+        tableView.snp.makeConstraints { make in
+            make.top.leading.trailing.bottom.equalToSuperview()
+        }
+        navigationItem.title = "Чаты"
+        navigationController?.navigationBar.prefersLargeTitles = true
         
     }
 
