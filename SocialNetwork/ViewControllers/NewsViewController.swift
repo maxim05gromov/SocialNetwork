@@ -9,12 +9,11 @@ import UIKit
 import SnapKit
 class NewsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    let refreshControl = UIRefreshControl()
-    
     lazy var tableView = UITableView(frame: CGRect.null, style: .insetGrouped)
     lazy var buttonView = UIButton()
     lazy var noPostsLabel = UILabel()
     lazy var activityIndicator = UIActivityIndicatorView()
+    lazy var refreshControl = UIRefreshControl()
     
     var loadingNews = true
     

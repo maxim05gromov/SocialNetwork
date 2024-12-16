@@ -13,6 +13,8 @@ class Model {
     var profile = Bindable<User>()
     var news = Bindable<[Post]>()
     var posts = Bindable<[Post]>()
+    var friends = Bindable<[User]>()
+    
     
     private var sessionID: String?
     
@@ -125,7 +127,7 @@ class Model {
     }
     
     func loadNews(completionHandler: @escaping() -> (), onError: @escaping(String) -> ()) {
-        request(endpoint: "posts", sessionKey: true) { data in
+        request(endpoint: "news", sessionKey: true) { data in
             do{
                 self.news.value = try JSONDecoder().decode([Post].self, from: data)
             }catch let error{
@@ -137,5 +139,39 @@ class Model {
         }
     }
     
+    func loadPosts(completionHandler: @escaping() -> (), onError: @escaping(String) -> ()) {
+        request(endpoint: "posts", sessionKey: true) { data in
+            do{
+                self.posts.value = try JSONDecoder().decode([Post].self, from: data)
+            }catch let error{
+                onError("\(error.localizedDescription)")
+            }
+        } onError: { error in
+            self.posts.value = nil
+            onError(error)
+        }
+    }
+    
+    func loadFriends(completionHandler: @escaping() -> (), onError: @escaping(String) -> ()) {
+        request(endpoint: "friends", sessionKey: true) { data in
+            do{
+                self.friends.value = try JSONDecoder().decode([User].self, from: data)
+            }catch let error{
+                onError("\(error.localizedDescription)")
+            }
+        } onError: { error in
+            self.friends.value = nil
+            onError(error)
+        }
+    }
+    
+    func logout() {
+        profile.value = nil
+        posts.value = nil
+        friends.value = nil
+        news.value = nil
+        sessionID = nil
+        UserDefaults.standard.removeObject(forKey: "sessionID")
+    }
 }
 

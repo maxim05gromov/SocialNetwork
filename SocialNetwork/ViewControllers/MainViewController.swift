@@ -9,7 +9,6 @@ import UIKit
 import SnapKit
 class MainViewController: UIViewController {
     lazy var mainLabel = UILabel()
-    lazy var enterButton = UIButton()
     lazy var registerButton = UIButton()
     lazy var registerLabel = UILabel()
     lazy var loginButton = UIButton()
@@ -17,9 +16,22 @@ class MainViewController: UIViewController {
     lazy var usernameTextField = UITextField()
     lazy var passwordTextField = UITextField()
     lazy var datePicker = UIDatePicker()
-    lazy var picker = UIPickerView()
+    lazy var dateLabel = UILabel()
+    lazy var dateStack = UIStackView(arrangedSubviews: [dateLabel, datePicker])
+    lazy var picker = UISegmentedControl(items: ["Мужской", "Женский"])
+    lazy var pickerLabel = UILabel()
+    lazy var pickerStack = UIStackView(arrangedSubviews: [pickerLabel, picker])
     
-    lazy var stackView = UIStackView()
+    lazy var stackView = UIStackView(arrangedSubviews: [
+        mainLabel,
+        usernameTextField,
+        passwordTextField,
+        dateStack,
+        pickerStack,
+        loginButton,
+        registerLabel,
+        registerButton
+    ])
     
     lazy var activityIndicator = UIActivityIndicatorView()
     
@@ -28,16 +40,16 @@ class MainViewController: UIViewController {
             UIView.animate(withDuration: 0.3) {
                 if self.registerMode{
                     self.mainLabel.text = "Добро пожаловать"
-                    self.datePicker.isHidden = false
-                    self.picker.isHidden = false
-                    self.enterButton.setTitle("Создать аккаунт", for: .normal)
+                    self.dateStack.isHidden = false
+                    self.pickerStack.isHidden = false
+                    self.loginButton.setTitle("Создать аккаунт", for: .normal)
                     self.registerLabel.text = "Уже есть аккаунт?"
                     self.registerButton.setTitle("Войти", for: .normal)
                 }else {
                     self.mainLabel.text = "Вход в аккаунт"
-                    self.datePicker.isHidden = true
-                    self.picker.isHidden = true
-                    self.enterButton.setTitle("Войти", for: .normal)
+                    self.dateStack.isHidden = true
+                    self.pickerStack.isHidden = true
+                    self.loginButton.setTitle("Войти", for: .normal)
                     self.registerLabel.text = "Еще нет аккаунта?"
                     self.registerButton.setTitle("Зарегистрироваться", for: .normal)
                 }
@@ -70,6 +82,9 @@ class MainViewController: UIViewController {
             tabBarController.viewControllers = [newsVC, conversationVC, friendsVC, profileVC]
             tabBarController.modalPresentationStyle = .fullScreen
             self.present(tabBarController, animated: false)
+            self.stackView.isHidden = false
+            self.activityIndicator.stopAnimating()
+            self.activityIndicator.isHidden = true
         }
     }
     override func viewDidLoad() {
@@ -98,7 +113,6 @@ class MainViewController: UIViewController {
         
         stackView.axis = .vertical
         
-        stackView.addArrangedSubview(mainLabel)
         mainLabel.textAlignment = .center
         mainLabel.snp.makeConstraints { make in
             make.height.equalTo(50)
@@ -106,7 +120,6 @@ class MainViewController: UIViewController {
         mainLabel.font = .boldSystemFont(ofSize: 35)
         
         
-        stackView.addArrangedSubview(usernameTextField)
         stackView.spacing = 30
         usernameTextField.placeholder = "Имя пользователя"
         usernameTextField.borderStyle = .roundedRect
@@ -114,7 +127,6 @@ class MainViewController: UIViewController {
             make.height.equalTo(35)
         }
         
-        stackView.addArrangedSubview(passwordTextField)
         passwordTextField.placeholder = "Пароль"
         passwordTextField.borderStyle = .roundedRect
         passwordTextField.snp.makeConstraints { make in
@@ -122,20 +134,17 @@ class MainViewController: UIViewController {
             make.height.equalTo(35)
         }
         
-        stackView.addArrangedSubview(loginButton)
         loginButton.backgroundColor = .systemBlue
         loginButton.layer.cornerRadius = 15
         loginButton.snp.makeConstraints { make in
             make.height.equalTo(50)
         }
-        loginButton.titleLabel?.font = .boldSystemFont(ofSize: 10)
+        loginButton.titleLabel?.font = .boldSystemFont(ofSize: 20)
         loginButton.setTitleColor(.white, for: .normal)
         loginButton.addTarget(self, action: #selector(loginButtonTapped), for: .touchUpInside)
         
-        stackView.addArrangedSubview(registerLabel)
         registerLabel.textAlignment = .center
         
-        stackView.addArrangedSubview(registerButton)
         registerButton.setTitleColor(.systemBlue, for: .normal)
         registerButton.snp.makeConstraints { make in
             make.top.equalTo(registerLabel.snp.bottom)
@@ -143,7 +152,14 @@ class MainViewController: UIViewController {
         registerButton.addTarget(self, action: #selector(registerButtonTapped), for: .touchUpInside)
         registerMode = false
         
-        
+        picker.selectedSegmentIndex = 0
+        datePicker.preferredDatePickerStyle = .compact
+        datePicker.datePickerMode = .date
+        pickerLabel.text = "Пол:"
+        dateLabel.text = "Дата рождения:"
+        pickerStack.snp.makeConstraints { make in
+            make.top.equalTo(dateStack.snp.bottom).offset(10)
+        }
         view.addSubview(activityIndicator)
         activityIndicator.snp.makeConstraints { make in
             make.center.equalToSuperview()

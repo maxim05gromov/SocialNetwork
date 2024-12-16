@@ -13,14 +13,17 @@ class ProfileTableViewCell: UITableViewCell {
     lazy var nameLabel = UILabel()
     lazy var divider = UIView()
     lazy var imageNameStackView = UIStackView(arrangedSubviews: [profileImageView, nameLabel])
-    lazy var vstackView = UIStackView(arrangedSubviews: [imageNameStackView, divider])
-    
+    lazy var vstackView = UIStackView(arrangedSubviews: [
+        imageNameStackView,
+        divider,
+        makeInfoRow(name: "Дата рождения", text: "23.03.2005"),
+        makeInfoRow(name: "Пол", text: "мужской")
+    ])
     func makeInfoRow(name: String, text: String) -> UIStackView{
         let nameLabel = UILabel()
         nameLabel.text = name
         let textLabel = UILabel()
         textLabel.text = text
-        
         var stackView = UIStackView(arrangedSubviews: [nameLabel, textLabel])
         stackView.axis = .horizontal
         return stackView
@@ -61,8 +64,6 @@ class ProfileTableViewCell: UITableViewCell {
             make.height.equalTo(1)
             make.leading.trailing.equalToSuperview()
         }
-        vstackView.addArrangedSubview(makeInfoRow(name: "Дата рождения", text: "23.03.2005"))
-        vstackView.addArrangedSubview(makeInfoRow(name: "Пол", text: "мужской"))
     }
 
 }
