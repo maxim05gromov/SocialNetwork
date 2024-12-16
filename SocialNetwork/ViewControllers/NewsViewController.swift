@@ -85,6 +85,7 @@ class NewsViewController: UIViewController, UITableViewDelegate, UITableViewData
             DispatchQueue.main.async {
                 self.activityIndicator.stopAnimating()
                 self.tableView.reloadData()
+                self.refreshControl.endRefreshing()
             }
         }
         
@@ -109,10 +110,7 @@ class NewsViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     @objc func refresh(_ sender: AnyObject) {
         Model.shared.loadNews {
-            DispatchQueue.main.async {
-                self.refreshControl.endRefreshing()
-                self.tableView.reloadData()
-            }
+            print("News loaded")
         } onError: { error in
             self.presentAlert(title: "Ошибка", message: error)
         }

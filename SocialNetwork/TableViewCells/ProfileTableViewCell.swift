@@ -13,12 +13,10 @@ class ProfileTableViewCell: UITableViewCell {
     lazy var nameLabel = UILabel()
     lazy var divider = UIView()
     lazy var imageNameStackView = UIStackView(arrangedSubviews: [profileImageView, nameLabel])
-    lazy var vstackView = UIStackView(arrangedSubviews: [
-        imageNameStackView,
-        divider,
-        makeInfoRow(name: "Дата рождения", text: "23.03.2005"),
-        makeInfoRow(name: "Пол", text: "мужской")
-    ])
+    lazy var birthday = UIStackView()
+    lazy var gender = UIStackView()
+    
+    lazy var vstackView = UIStackView()
     func makeInfoRow(name: String, text: String) -> UIStackView{
         let nameLabel = UILabel()
         nameLabel.text = name
@@ -30,6 +28,8 @@ class ProfileTableViewCell: UITableViewCell {
     }
     
     func configure(user: User?){
+        vstackView.removeFromSuperview()
+        vstackView = UIStackView()
         let name = user?.name ?? ""
         let secondName = user?.second_name ?? ""
         
@@ -42,6 +42,9 @@ class ProfileTableViewCell: UITableViewCell {
         vstackView.snp.makeConstraints { make in
             make.top.leading.trailing.bottom.equalToSuperview().inset(10)
         }
+        vstackView.addArrangedSubview(imageNameStackView)
+        vstackView.addArrangedSubview(divider)
+        
         
         imageNameStackView.snp.makeConstraints { make in
             make.top.leading.trailing.equalToSuperview()
@@ -64,6 +67,10 @@ class ProfileTableViewCell: UITableViewCell {
             make.height.equalTo(1)
             make.leading.trailing.equalToSuperview()
         }
+        birthday = makeInfoRow(name: "Дата рождения", text: "\(user?.birthday ?? "Неизвестно")")
+        gender = makeInfoRow(name: "Пол", text: user?.gender == .male ? "Мужской" : "Женский")
+        vstackView.addArrangedSubview(birthday)
+        vstackView.addArrangedSubview(gender)
     }
 
 }

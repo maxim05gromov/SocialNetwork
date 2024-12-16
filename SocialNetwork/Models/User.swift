@@ -10,7 +10,7 @@ struct User: Codable, Identifiable{
     let id: Int
     var name: String
     var second_name: String
-    var birthday: Date
+    var birthday: String
     var username: String
     var password: String
     var image: URL?

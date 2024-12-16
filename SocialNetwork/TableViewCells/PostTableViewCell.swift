@@ -56,10 +56,10 @@ class PostTableViewCell: UITableViewCell {
         }
         
         
-        usernameLabel.text = "User"
+        usernameLabel.text = "\(post.user.name) \(post.user.second_name)"
         usernameLabel.font = .boldSystemFont(ofSize: 24)
         
-        dateLabel.text = "5 cекунд назад"
+        dateLabel.text = post.timestamp
         dateLabel.font = .systemFont(ofSize: 16)
         
         contentTextLabel.font = .systemFont(ofSize: 20)
@@ -74,29 +74,24 @@ class PostTableViewCell: UITableViewCell {
 //            watchFullLabel.isHidden = true
 //        }
         
-        if post.image != nil {
-            image.image = UIImage(named: "test_image")
-            image.backgroundColor = .red
-            image.contentMode = .scaleAspectFit
-            let koef: Double = image.image!.size.height / image.image!.size.width
-            image.snp.makeConstraints { make in
-                make.width.equalTo(hstack)
-                make.height.equalTo(hstack.snp.width).multipliedBy(koef)
-            }
-            image.clipsToBounds = true
-            image.isHidden = false
-            image.layer.cornerRadius = 10
-        }else{
-            image.isHidden = true
-        }
+//        if post.image != nil {
+//            image.image = UIImage(named: "test_image")
+//            image.backgroundColor = .red
+//            image.contentMode = .scaleAspectFit
+//            let koef: Double = image.image!.size.height / image.image!.size.width
+//            image.snp.makeConstraints { make in
+//                make.width.equalTo(hstack)
+//                make.height.equalTo(hstack.snp.width).multipliedBy(koef)
+//            }
+//            image.clipsToBounds = true
+//            image.isHidden = false
+//            image.layer.cornerRadius = 10
+//        }else{
+//            image.isHidden = true
+//        }
+        image.isHidden = true
     }
     
     
 }
 
-#Preview {
-    let cell = PostTableViewCell()
-    let post = Post(id: 0, likes: [], text: "Hello World", image: URL("http://www.vk.com"), userID: 0, timestamp: Date(), comments: [])
-    cell.configure(post: post)
-    return cell
-}

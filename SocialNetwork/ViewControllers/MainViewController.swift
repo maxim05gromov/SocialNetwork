@@ -15,6 +15,8 @@ class MainViewController: UIViewController {
     
     lazy var usernameTextField = UITextField()
     lazy var passwordTextField = UITextField()
+    lazy var nameTextField = UITextField()
+    lazy var secondTextField = UITextField()
     lazy var datePicker = UIDatePicker()
     lazy var dateLabel = UILabel()
     lazy var dateStack = UIStackView(arrangedSubviews: [dateLabel, datePicker])
@@ -26,6 +28,8 @@ class MainViewController: UIViewController {
         mainLabel,
         usernameTextField,
         passwordTextField,
+        nameTextField,
+        secondTextField,
         dateStack,
         pickerStack,
         loginButton,
@@ -44,6 +48,8 @@ class MainViewController: UIViewController {
                     self.pickerStack.isHidden = false
                     self.loginButton.setTitle("Создать аккаунт", for: .normal)
                     self.registerLabel.text = "Уже есть аккаунт?"
+                    self.nameTextField.isHidden = false
+                    self.secondTextField.isHidden = false
                     self.registerButton.setTitle("Войти", for: .normal)
                 }else {
                     self.mainLabel.text = "Вход в аккаунт"
@@ -51,6 +57,8 @@ class MainViewController: UIViewController {
                     self.pickerStack.isHidden = true
                     self.loginButton.setTitle("Войти", for: .normal)
                     self.registerLabel.text = "Еще нет аккаунта?"
+                    self.nameTextField.isHidden = true
+                    self.secondTextField.isHidden = true
                     self.registerButton.setTitle("Зарегистрироваться", for: .normal)
                 }
             }
@@ -73,6 +81,7 @@ class MainViewController: UIViewController {
             let profileVC = UINavigationController(rootViewController: profileContentVC)
             profileVC.title = "Профиль"
             profileVC.tabBarItem.image = UIImage(systemName: "person")
+            profileContentVC.editMode = true
             profileContentVC.user = Model.shared.profile.value
             
             let friendsVC = UINavigationController(rootViewController: FriendsViewController())
@@ -160,6 +169,21 @@ class MainViewController: UIViewController {
         pickerStack.snp.makeConstraints { make in
             make.top.equalTo(dateStack.snp.bottom).offset(10)
         }
+        
+        nameTextField.borderStyle = .roundedRect
+        nameTextField.placeholder = "Имя"
+        nameTextField.snp.makeConstraints { make in
+            make.top.equalTo(passwordTextField.snp.bottom).offset(10)
+        }
+        
+        secondTextField.borderStyle = .roundedRect
+        secondTextField.placeholder = "Фамилия"
+        secondTextField.snp.makeConstraints { make in
+            make.top.equalTo(nameTextField.snp.bottom).offset(5)
+        }
+        
+        
+        
         view.addSubview(activityIndicator)
         activityIndicator.snp.makeConstraints { make in
             make.center.equalToSuperview()
@@ -169,15 +193,38 @@ class MainViewController: UIViewController {
     
     @objc func loginButtonTapped() {
         guard let username = usernameTextField.text, let password = passwordTextField.text else {
-            self.presentAlert(title: "Введите логин и пароль", message: "Вы не ввели логин или пароль  Проверьте введенные данные")
+            self.presentAlert(title: "Введите логин и пароль", message: "Вы не ввели логин или пароль. Проверьте введенные данные")
             return
         }
         if username.isEmpty || password.isEmpty {
-            self.presentAlert(title: "Введите логин и пароль", message: "Вы не ввели логин или пароль  Проверьте введенные данные")
+            self.presentAlert(title: "Введите логин и пароль", message: "Вы не ввели логин или пароль. Проверьте введенные данные")
             return
         }
         
         if registerMode{
+            guard let name = nameTextField.text, let secondName = secondTextField.text else {
+                self.presentAlert(title: "Введите имя и фамилию", message: "Вы не ввели имя или фамилию. Проверьте введенные данные")
+                return
+            }
+            if name.isEmpty || secondName.isEmpty {
+                self.presentAlert(title: "Введите имя и фамилию", message: "Вы не ввели имя или фамилию. Проверьте введенные данные")
+                return
+            }
+            let date = datePicker.date
+            let gender = picker.selectedSegmentIndex
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "dd.MM.yyyy"
+            let formattedDate = dateFormatter.string(from: date)
+
+            Model.shared.register(name: name, secondName: secondName, username: username, password: password, dateOfBirth: formattedDate, gender: gender) {
+                self.showTabBarController()
+            } onError: { error in
+                DispatchQueue.main.async{
+                    self.presentAlert(title: "Ошибка", message: error)
+                }
+            }
+
+            
             
         }else{
             activityIndicator.isHidden = false

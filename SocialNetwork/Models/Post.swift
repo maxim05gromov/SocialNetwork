@@ -9,25 +9,19 @@ import Foundation
 
 class Post: Codable, Identifiable {
     let id: Int
-    var likes: [User]
     let text: String
-    let image: URL?
-    let userID: Int
-    let timestamp: Date
-    var comments: [Comment]
-    init(id: Int, likes: [User], text: String, image: URL?, userID: Int, timestamp: Date, comments: [Comment]) {
+    let user: User
+    let timestamp: String
+    init(id: Int, text: String, user: User, timestamp: String) {
         self.id = id
-        self.likes = likes
         self.text = text
-        self.image = image
-        self.userID = userID
+        self.user = user
         self.timestamp = timestamp
-        self.comments = comments
     }
 }
-struct Comment: Codable, Identifiable {
-    let id: Int
-    let userID: Int
-    let text: String
-    let timestamp: Date
-}
+//struct Comment: Codable, Identifiable {
+//    let id: Int
+//    let userID: Int
+//    let text: String
+//    let timestamp: Date
+//}

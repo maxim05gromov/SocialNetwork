@@ -1,17 +1,19 @@
 //
-//  FriendTableViewCell.swift
+//  ConversationTableViewCell.swift
 //  SocialNetwork
 //
 //  Created by Максим Громов on 12/16/24.
 //
 
 import UIKit
-import SnapKit
-class FriendTableViewCell: UITableViewCell {
-    
+
+class ConversationTableViewCell: UITableViewCell {
     lazy var nameLabel = UILabel()
+    lazy var lastMessageLabel = UILabel()
     lazy var avatarImageView = UIImageView()
-    lazy var hstack = UIStackView(arrangedSubviews: [avatarImageView, nameLabel])
+    lazy var vstack = UIStackView(arrangedSubviews: [nameLabel, lastMessageLabel])
+    lazy var hstack = UIStackView(arrangedSubviews: [avatarImageView, vstack])
+    
     override func awakeFromNib() {
         super.awakeFromNib()
     }
@@ -20,12 +22,13 @@ class FriendTableViewCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
     }
     
-    func configure(user: User){
+    func configure(conversation: Conversation){
         addSubview(hstack)
         hstack.snp.makeConstraints { make in
             make.edges.equalToSuperview().inset(10)
         }
         hstack.spacing = 10
+        vstack.axis = .vertical
         avatarImageView.image = UIImage(systemName: "person")
         avatarImageView.backgroundColor = .red
         avatarImageView.snp.makeConstraints { make in
@@ -34,9 +37,10 @@ class FriendTableViewCell: UITableViewCell {
         avatarImageView.layer.cornerRadius = 25
         avatarImageView.clipsToBounds = true
         
-        nameLabel.text = "\(user.name) \(user.second_name)"
+        nameLabel.text = "\(conversation.user.name) \(conversation.user.second_name)"
         nameLabel.font = .systemFont(ofSize: 24)
+        
+        lastMessageLabel.text = conversation.messages.last?.text
+        lastMessageLabel.font = .systemFont(ofSize: 16)
     }
-
 }
-

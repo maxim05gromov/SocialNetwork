@@ -14,6 +14,7 @@ class Model {
     var news = Bindable<[Post]>()
     var posts = Bindable<[Post]>()
     var friends = Bindable<[User]>()
+    var conversations = Bindable<[Conversation]>()
     
     
     private var sessionID: String?
@@ -28,6 +29,7 @@ class Model {
                  method: Method = .get,
                  sessionKey: Bool = false,
                  arguments: [String: Any] = [:],
+                 body: Data? = nil,
                  completionHandler: @escaping(Data) -> (),
                  onError: @escaping(String) -> ()) {
         var urlString = serverURL + endpoint
@@ -39,8 +41,13 @@ class Model {
                 onError("Session ID is nil")
                 return
             }
-        }else if arguments.count > 0{
-            urlString += "?"
+        }
+        if arguments.count > 0{
+            if !sessionKey{
+                urlString += "?"
+            }else{
+                urlString += "&"
+            }
             arguments.forEach {
                 urlString += "\($0)=\($1)&"
             }
@@ -56,6 +63,11 @@ class Model {
         
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
+        if let body {
+            request.httpBody = body
+            request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+            request.setValue("application/json", forHTTPHeaderField: "Accept")
+        }
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error {
                 onError("\(error.localizedDescription)")
@@ -116,7 +128,13 @@ class Model {
         request(endpoint: "login", method: .post, arguments: arguments) { data in
             self.sessionID = String(data: data, encoding: .utf8)
             UserDefaults.standard.set(self.sessionID, forKey: "sessionID")
-            completionHandler()
+            self.loadProfile { _ in
+                completionHandler()
+            } onError: { _ in
+                
+            }
+
+            
         } onError: { error in
             onError(error)
         }
@@ -172,6 +190,80 @@ class Model {
         news.value = nil
         sessionID = nil
         UserDefaults.standard.removeObject(forKey: "sessionID")
+    }
+    
+    func register(name: String, secondName: String, username: String, password: String, dateOfBirth: String, gender: Int, completionHandler: @escaping() -> (), onError: @escaping(String) -> ()){
+        let body: [String: Any] = [
+            "name": name,
+            "second_name": secondName,
+            "username": username,
+            "password": password,
+            "birthday": dateOfBirth,
+            "gender": gender
+        ]
+        let bodyData = body.percentEncoded()
+        request(endpoint: "register", method: .post, body: bodyData) { data in
+            self.sessionID = String(data: data, encoding: .utf8)
+            UserDefaults.standard.set(self.sessionID, forKey: "sessionID")
+            self.loadProfile { _ in
+                completionHandler()
+            } onError: { _ in
+                
+            }
+            
+        } onError: { error in
+            onError(error)
+        }
+    }
+    
+    func loadConversations(completionHandler: @escaping() -> (), onError: @escaping(String) -> ()) {
+        request(endpoint: "conversations", method: .get, sessionKey: true) { data in
+            do{
+                self.conversations.value = try JSONDecoder().decode([Conversation].self, from: data)
+            }catch let error{
+                onError(error.localizedDescription)
+            }
+            completionHandler()
+        } onError: { error in
+            onError(error)
+        }
+    }
+    
+    func newPost(text: String, completionHandler: @escaping() -> (), onError: @escaping(String) -> ()){
+        request(endpoint: "new_post", method: .post, sessionKey: true, arguments: ["text": text]) { data in
+            completionHandler()
+            self.loadPosts {
+                
+            } onError: { _ in
+                
+            }
+
+        } onError: { error in
+            onError(error)
+        }
+    }
+    
+    func newMessage(text: String, convID: Int, completionHandler: @escaping(Conversation) -> (), onError: @escaping(String) -> ()){
+        request(endpoint: "new_message", method: .post, sessionKey: true, arguments: [
+            "conv_id": convID,
+            "text": text]
+        ) { data in
+            do {
+                let conversation = try JSONDecoder().decode(Conversation.self, from: data)
+                completionHandler(conversation)
+            }catch let error{
+                onError(error.localizedDescription)
+            }
+            
+            self.loadConversations {
+                
+            } onError: { _ in
+                
+            }
+
+        } onError: { error in
+            onError(error)
+        }
     }
 }
 

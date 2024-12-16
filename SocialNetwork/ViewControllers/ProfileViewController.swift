@@ -22,7 +22,7 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
         
         navigationItem.title = "Профиль"
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(edit))
+//        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(edit))
         
         view.addSubview(tableView)
         
@@ -36,35 +36,38 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
             make.edges.equalToSuperview()
         }
         
-        refreshControl.addTarget(self, action: #selector(self.refresh(_:)), for: .valueChanged)
-        tableView.addSubview(refreshControl)
         
-        Model.shared.posts.bind { _ in
-            DispatchQueue.main.async {
-                self.activityIndicator.stopAnimating()
-                self.tableView.reloadData()
+        if editMode {
+            refreshControl.addTarget(self, action: #selector(self.refresh(_:)), for: .valueChanged)
+            tableView.addSubview(refreshControl)
+            Model.shared.posts.bind { _ in
+                DispatchQueue.main.async {
+                    self.activityIndicator.stopAnimating()
+                    self.tableView.reloadData()
+                    self.refreshControl.endRefreshing()
+                }
             }
+            
+            Model.shared.loadPosts {
+                print("Posts loaded")
+            } onError: { error in
+                self.presentAlert(title: "Ошибка", message: error)
+            }
+            
+            view.addSubview(activityIndicator)
+            activityIndicator.hidesWhenStopped = true
+            activityIndicator.snp.makeConstraints { make in
+                make.center.equalTo(view.center)
+            }
+            activityIndicator.style = .large
+            activityIndicator.startAnimating()
         }
         
-        Model.shared.loadPosts {
-            print("Posts loaded")
-        } onError: { error in
-            self.presentAlert(title: "Ошибка", message: error)
-        }
-        
-        view.addSubview(activityIndicator)
-        activityIndicator.hidesWhenStopped = true
-        activityIndicator.snp.makeConstraints { make in
-            make.center.equalTo(view.center)
-        }
-        activityIndicator.style = .large
-        activityIndicator.startAnimating()
     }
     @objc func refresh(_ sender: Any) {
         Model.shared.loadPosts {
             DispatchQueue.main.async {
-                self.refreshControl.endRefreshing()
-                self.tableView.reloadData()
+                print("Posts loaded")
             }
         } onError: { error in
             self.presentAlert(title: "Ошибка", message: error)
@@ -72,14 +75,17 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
 
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if section == 0 {
+        if section == 0 && editMode{
             return 2
         }
         return 1
     }
     func numberOfSections(in tableView: UITableView) -> Int {
-        let posts = Model.shared.posts.value?.count ?? 0
-        return 2 + posts
+        if editMode{
+            let posts = Model.shared.posts.value?.count ?? 0
+            return 2 + posts
+        }
+        return 1
     }
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return CGFloat.leastNormalMagnitude
@@ -135,8 +141,3 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
 }
 
-#Preview {
-    let vc = ProfileViewController()
-    vc.user = User(id: 0, name: "Maxim", second_name: "Gromov", birthday: Date(), username: "gromovm237", password: "password", gender: .male)
-    return UINavigationController(rootViewController: vc)
-}
