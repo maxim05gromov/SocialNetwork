@@ -13,10 +13,11 @@ class PostTableViewCell: UITableViewCell {
     lazy var userAvatar = UIImageView()
     lazy var contentTextLabel = UILabel()
     lazy var image = UIImageView()
+    lazy var watchFullLabel = UILabel()
     
     lazy var hstack = UIStackView(arrangedSubviews: [userAvatar, vstack])
     lazy var vstack = UIStackView(arrangedSubviews: [usernameLabel, dateLabel])
-    lazy var stackView = UIStackView(arrangedSubviews: [hstack, contentTextLabel, image])
+    lazy var stackView = UIStackView(arrangedSubviews: [hstack, contentTextLabel, watchFullLabel, image])
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -25,7 +26,10 @@ class PostTableViewCell: UITableViewCell {
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
     }
-    
+//    func clicked(){
+//        print("clicked \(contentTextLabel.text)")
+//        contentTextLabel.numberOfLines = 0
+//    }
     func configure(post: Post) {
         addSubview(stackView)
         
@@ -60,16 +64,31 @@ class PostTableViewCell: UITableViewCell {
         
         contentTextLabel.font = .systemFont(ofSize: 20)
         contentTextLabel.text = post.text
+        contentTextLabel.numberOfLines = 0
         
-        image.image = UIImage(named: "test_image")
-        image.backgroundColor = .red
-        image.contentMode = .scaleAspectFit
-        let koef: Double = image.image!.size.height / image.image!.size.width
-        image.snp.makeConstraints { make in
-            make.width.equalTo(hstack)
-            make.height.equalTo(hstack.snp.width).multipliedBy(koef)
+//        watchFullLabel.text = "Посмотреть полностью"
+//        watchFullLabel.font = .systemFont(ofSize: 16)
+//        watchFullLabel.textColor = .systemGray
+//        
+//        if contentTextLabel.calculateMaxLines() < 6 {
+//            watchFullLabel.isHidden = true
+//        }
+        
+        if post.image != nil {
+            image.image = UIImage(named: "test_image")
+            image.backgroundColor = .red
+            image.contentMode = .scaleAspectFit
+            let koef: Double = image.image!.size.height / image.image!.size.width
+            image.snp.makeConstraints { make in
+                make.width.equalTo(hstack)
+                make.height.equalTo(hstack.snp.width).multipliedBy(koef)
+            }
+            image.clipsToBounds = true
+            image.isHidden = false
+            image.layer.cornerRadius = 10
+        }else{
+            image.isHidden = true
         }
-        image.clipsToBounds = true
     }
     
     
@@ -77,7 +96,7 @@ class PostTableViewCell: UITableViewCell {
 
 #Preview {
     let cell = PostTableViewCell()
-    let post = Post(id: 0, likes: [], text: "Hello World", image: nil, userID: 0, timestamp: Date(), comments: [])
+    let post = Post(id: 0, likes: [], text: "Hello World", image: URL("http://www.vk.com"), userID: 0, timestamp: Date(), comments: [])
     cell.configure(post: post)
     return cell
 }

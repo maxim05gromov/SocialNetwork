@@ -12,8 +12,6 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
     var user: User?
     var editMode = false
     
-    
-    
     lazy var tableView = UITableView(frame: .null, style: .insetGrouped)
     
     override func viewDidLoad() {
@@ -31,29 +29,29 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
         tableView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        
-        
     }
-    
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        switch section {
-            case 0: return 1
-            case 1: return 1
-            default: return Model.shared.posts.value?.count ?? 0
-        }
+        return 1
     }
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 3
+        let posts = Model.shared.posts.value?.count ?? 0
+        return 2 + posts
     }
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        switch indexPath.section {
-        case 0: return 150
-        case 1: return 40
-        default: return 100
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return CGFloat.leastNormalMagnitude
+    }
+
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        return UIView()
+    }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.section == 1 {
+            let newPostVC = NewPostViewController()
+            navigationController?.pushViewController(newPostVC, animated: true)
+            tableView.deselectRow(at: indexPath, animated: true)
         }
     }
-    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let section = indexPath.section
         switch section {
@@ -70,7 +68,7 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
             return cell
         default:
             let cell = tableView.dequeueReusableCell(withIdentifier: "Post", for: indexPath) as! PostTableViewCell
-            guard let post = Model.shared.posts.value?[indexPath.row] else {
+            guard let post = Model.shared.posts.value?[indexPath.section - 2] else {
                 return UITableViewCell()
             }
             cell.configure(post: post)
@@ -84,5 +82,5 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
 #Preview {
     let vc = ProfileViewController()
     vc.user = User(id: 0, name: "Maxim", second_name: "Gromov", birthday: Date(), username: "gromovm237", password: "password", gender: .male)
-    return vc
+    return UINavigationController(rootViewController: vc)
 }

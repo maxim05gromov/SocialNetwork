@@ -11,31 +11,58 @@ class ProfileTableViewCell: UITableViewCell {
     
     lazy var profileImageView = UIImageView()
     lazy var nameLabel = UILabel()
-    lazy var secondNameLabel = UILabel()
+    lazy var divider = UIView()
+    lazy var imageNameStackView = UIStackView(arrangedSubviews: [profileImageView, nameLabel])
+    lazy var vstackView = UIStackView(arrangedSubviews: [imageNameStackView, divider])
     
-    lazy var nameVStack = UIStackView(arrangedSubviews: [nameLabel, secondNameLabel])
-    lazy var imageNameStackView = UIStackView(arrangedSubviews: [profileImageView, nameVStack])
+    func makeInfoRow(name: String, text: String) -> UIStackView{
+        let nameLabel = UILabel()
+        nameLabel.text = name
+        let textLabel = UILabel()
+        textLabel.text = text
+        
+        var stackView = UIStackView(arrangedSubviews: [nameLabel, textLabel])
+        stackView.axis = .horizontal
+        return stackView
+    }
     
     func configure(user: User?){
         let name = user?.name ?? ""
         let secondName = user?.second_name ?? ""
         
         imageNameStackView.axis = .horizontal
-        nameVStack.axis = .vertical
+        imageNameStackView.spacing = 10
         
-        addSubview(imageNameStackView)
-        imageNameStackView.snp.makeConstraints { make in
-            make.top.leading.trailing.equalTo(self)
+        addSubview(vstackView)
+        vstackView.axis = .vertical
+        vstackView.spacing = 10
+        vstackView.snp.makeConstraints { make in
+            make.top.leading.trailing.bottom.equalToSuperview().inset(10)
         }
         
+        imageNameStackView.snp.makeConstraints { make in
+            make.top.leading.trailing.equalToSuperview()
+        }
         profileImageView.image = UIImage(systemName: "person")
         profileImageView.contentMode = .scaleAspectFill
-        profileImageView.backgroundColor = .yellow
+        profileImageView.backgroundColor = .red
         profileImageView.snp.makeConstraints { make in
-            make.width.height.equalTo(100)
+            make.width.height.equalTo(80)
         }
-        nameLabel.text = name
-        secondNameLabel.text = secondName
+        profileImageView.layer.cornerRadius = 40
+        profileImageView.layer.masksToBounds = true
+        
+        nameLabel.text = "\(name)\n\(secondName)"
+        nameLabel.numberOfLines = 0
+        nameLabel.font = .systemFont(ofSize: 32, weight: .bold)
+        
+        divider.backgroundColor = .lightGray
+        divider.snp.makeConstraints { make in
+            make.height.equalTo(1)
+            make.leading.trailing.equalToSuperview()
+        }
+        vstackView.addArrangedSubview(makeInfoRow(name: "Дата рождения", text: "23.03.2005"))
+        vstackView.addArrangedSubview(makeInfoRow(name: "Пол", text: "мужской"))
     }
 
 }

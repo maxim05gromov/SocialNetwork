@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		81F130F12D0DB81600B1F1D7 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 81F130F02D0DB81600B1F1D7 /* SnapKit */; };
-		81F130FC2D0DC26600B1F1D7 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 81F130FB2D0DC26600B1F1D7 /* Alamofire */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,7 +41,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				81F130F12D0DB81600B1F1D7 /* SnapKit in Frameworks */,
-				81F130FC2D0DC26600B1F1D7 /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,7 +84,6 @@
 			name = SocialNetwork;
 			packageProductDependencies = (
 				81F130F02D0DB81600B1F1D7 /* SnapKit */,
-				81F130FB2D0DC26600B1F1D7 /* Alamofire */,
 			);
 			productName = SocialNetwork;
 			productReference = 81F130D52D0DB43000B1F1D7 /* SocialNetwork.app */;
@@ -118,7 +115,6 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				81F130EF2D0DB81600B1F1D7 /* XCRemoteSwiftPackageReference "SnapKit" */,
-				81F130FA2D0DC26600B1F1D7 /* XCRemoteSwiftPackageReference "Alamofire" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 81F130D62D0DB43000B1F1D7 /* Products */;
@@ -163,9 +159,9 @@
 				INFOPLIST_FILE = SocialNetwork/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -191,9 +187,9 @@
 				INFOPLIST_FILE = SocialNetwork/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -358,14 +354,6 @@
 				minimumVersion = 5.7.1;
 			};
 		};
-		81F130FA2D0DC26600B1F1D7 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.10.2;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -373,11 +361,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 81F130EF2D0DB81600B1F1D7 /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
-		};
-		81F130FB2D0DC26600B1F1D7 /* Alamofire */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 81F130FA2D0DC26600B1F1D7 /* XCRemoteSwiftPackageReference "Alamofire" */;
-			productName = Alamofire;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

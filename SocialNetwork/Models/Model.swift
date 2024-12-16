@@ -16,97 +16,126 @@ class Model {
     
     private var sessionID: String?
     
-    func loadSessionKey() {
-        sessionID = UserDefaults.standard.string(forKey: "sessionID")
-        if let sessionID {
-            print("loaded")
-        }
+    
+    enum Method: String {
+        case get = "GET"
+        case post = "POST"
     }
-    func loadProfile(completionHandler: @escaping(String?) -> Void) {
-        print("sessionID \(sessionID)")
-        if let sessionID {
-            guard let url = URL(string: serverURL + "user?session_key=\(sessionID)") else {
-                completionHandler("Invalid URL")
+    
+    private func request(endpoint: String,
+                 method: Method = .get,
+                 sessionKey: Bool = false,
+                 arguments: [String: Any] = [:],
+                 completionHandler: @escaping(Data) -> (),
+                 onError: @escaping(String) -> ()) {
+        var urlString = serverURL + endpoint
+        if sessionKey {
+            loadSessionKey()
+            if let sessionID {
+                urlString += "?session_key=\(sessionID)"
+            }else{
+                onError("Session ID is nil")
                 return
             }
-            var request = URLRequest(url: url)
-            URLSession.shared.dataTask(with: request) { data, response, error in
-                guard let response = response as? HTTPURLResponse else { return }
-                guard let data else { return }
-                if response.statusCode != 200 {
-                    let errorMessage = String(data: data, encoding: .utf8)
-                    print("error: \(errorMessage)")
-                    completionHandler(errorMessage)
-                }else{
-                    do {
-                        let decoder = JSONDecoder()
-                        let user = try decoder.decode(User.self, from: data)
-                        self.profile.value = user
-                        completionHandler(nil)
-                    }catch let error {
-                        print("Error decoding: \(error)")
-                    }
-                }
-            }.resume()
-        } else {
-            profile.value = nil
-            completionHandler("No session")
+        }else if arguments.count > 0{
+            urlString += "?"
+            arguments.forEach {
+                urlString += "\($0)=\($1)&"
+            }
         }
-    }
-    
-    func getUser(id: Int, completionHandler: @escaping(String?) -> Void){
-        
-    }
-    
-    func login(username: String, password: String, completionHandler: @escaping(String?) -> Void) {
-        guard let url = URL(string: serverURL + "login?username=\(username)&password=\(password)") else {
-            completionHandler("Invalid URL")
+        if urlString.hasSuffix("&") {
+            urlString.removeLast()
+        }
+        print("url: \(urlString)")
+        guard let url = URL(string: urlString) else {
+            onError("Invalid URL")
             return
         }
+        
         var request = URLRequest(url: url)
-        request.httpMethod = "POST"
+        request.httpMethod = method.rawValue
         URLSession.shared.dataTask(with: request) { data, response, error in
-            guard let response = response as? HTTPURLResponse else { return }
-            guard let data else { return }
-            if response.statusCode == 200 {
-                self.sessionID = String(data: data, encoding: .utf8)
-                UserDefaults.standard.set(self.sessionID, forKey: "sessionID")
-                completionHandler(nil)
-            } else if response.statusCode == 401 {
-                completionHandler("Wrong username or password")
+            if let error {
+                onError("\(error.localizedDescription)")
+                return
+            }
+            guard let response = response as? HTTPURLResponse else {
+                onError("Cannot get response")
+                return
+            }
+            guard let data else {
+                onError("Cannot decode data")
+                return
+            }
+            if response.statusCode != 200 {
+                let errorMessage = String(data: data, encoding: .utf8)
+                onError(errorMessage ?? "Unknown error")
+            }else{
+                completionHandler(data)
             }
         }.resume()
     }
     
-    func loadAvatar(source: URL, completionHandler: @escaping(Data?) -> Void) {
+    private func loadSessionKey() {
+        if sessionID == nil {
+            sessionID = UserDefaults.standard.string(forKey: "sessionID")
+        }
+    }
+    
+    func loadProfile(completionHandler: @escaping(User) -> (), onError: @escaping(String) -> ()) {
+        loadSessionKey()
+        if sessionID != nil {
+            request(endpoint: "user", sessionKey: true) { data in
+                do {
+                    let user = try JSONDecoder().decode(User.self, from: data)
+                    self.profile.value = user
+                    completionHandler(user)
+                }catch let error {
+                    onError(error.localizedDescription)
+                }
+            } onError: { error in
+                onError(error)
+            }
+        } else {
+            profile.value = nil
+            onError("No session")
+        }
+    }
+    
+    func getUser(id: Int, completionHandler: @escaping(String) -> ()){
         
     }
     
-    func loadNews(completionHandler: @escaping(String?) -> Void) {
-        if let sessionID {
-            print("Load news")
-            guard let url = URL(string: serverURL + "/posts?session_key=\(sessionID)") else {
-                completionHandler("Invalid URL")
-                return
-            }
-            let request = URLRequest(url: url)
-            URLSession.shared.dataTask(with: request) { data, response, error in
-                guard let response = response as? HTTPURLResponse else { return }
-                guard let data else { return }
-                if response.statusCode == 200 {
-                    do{
-                        print(String(data: data, encoding: .utf8))
-                        self.news.value = try JSONDecoder().decode([Post].self, from: data)
-                        completionHandler(nil)
-                    }catch let error{
-                        completionHandler("Error decoding JSON: \(error)")
-                    }
-                }
-            }.resume()
-        } else {
-            print("Cannot load news")
-            news.value = nil
+    func login(username: String, password: String, completionHandler: @escaping() -> (), onError: @escaping(String) -> ()) {
+        let arguments: [String: Any] = [
+            "username": username,
+            "password": password
+        ]
+        request(endpoint: "login", method: .post, arguments: arguments) { data in
+            self.sessionID = String(data: data, encoding: .utf8)
+            UserDefaults.standard.set(self.sessionID, forKey: "sessionID")
+            completionHandler()
+        } onError: { error in
+            onError(error)
         }
     }
+    
+    func loadAvatar(source: URL, completionHandler: @escaping(Data?) -> ()) {
+        
+    }
+    
+    func loadNews(completionHandler: @escaping() -> (), onError: @escaping(String) -> ()) {
+        request(endpoint: "posts", sessionKey: true) { data in
+            do{
+                self.news.value = try JSONDecoder().decode([Post].self, from: data)
+            }catch let error{
+                onError("\(error.localizedDescription)")
+            }
+        } onError: { error in
+            self.news.value = nil
+            onError(error)
+        }
+    }
+    
 }
 

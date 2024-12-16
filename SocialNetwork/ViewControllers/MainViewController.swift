@@ -75,23 +75,20 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.backgroundColor = .white
+        
         stackView.isHidden = true
         activityIndicator.style = .large
         
-        
-        Model.shared.loadSessionKey()
-        Model.shared.loadProfile(completionHandler: { error in
-            print("error \(error)")
-            if error != nil {
+        Model.shared.loadProfile { _ in
+            self.showTabBarController()
+        } onError: { _ in
+            DispatchQueue.main.async {
                 self.stackView.isHidden = false
                 self.activityIndicator.stopAnimating()
                 self.activityIndicator.isHidden = true
-            }else{
-                self.showTabBarController()
             }
-        })
-        
-        view.backgroundColor = .white
+        }
         
         view.addSubview(stackView)
         stackView.snp.makeConstraints { make in
@@ -100,7 +97,6 @@ class MainViewController: UIViewController {
         }
         
         stackView.axis = .vertical
-
         
         stackView.addArrangedSubview(mainLabel)
         mainLabel.textAlignment = .center
@@ -156,8 +152,14 @@ class MainViewController: UIViewController {
     }
     
     @objc func loginButtonTapped() {
-        let username = usernameTextField.text ?? ""
-        let password = passwordTextField.text ?? ""
+        guard let username = usernameTextField.text, let password = passwordTextField.text else {
+            self.presentAlert(title: "Введите логин и пароль", message: "Вы не ввели логин или пароль  Проверьте введенные данные")
+            return
+        }
+        if username.isEmpty || password.isEmpty {
+            self.presentAlert(title: "Введите логин и пароль", message: "Вы не ввели логин или пароль  Проверьте введенные данные")
+            return
+        }
         
         if registerMode{
             
@@ -165,16 +167,17 @@ class MainViewController: UIViewController {
             activityIndicator.isHidden = false
             activityIndicator.startAnimating()
             stackView.isHidden = true
-            Model.shared.login(username: username, password: password) { result in
-                if result != nil{
+            
+            Model.shared.login(username: username, password: password) {
+                DispatchQueue.main.async{
+                    self.activityIndicator.stopAnimating()
                     self.showTabBarController()
-                }else{
+                }
+            } onError: { error in
+                DispatchQueue.main.async{
                     self.activityIndicator.stopAnimating()
                     self.stackView.isHidden = false
-                    let alert = UIAlertController(title: "Ошибка", message: "Неверный логин или пароль", preferredStyle: .alert)
-                    let okAction = UIAlertAction(title: "OK", style: .default)
-                    alert.addAction(okAction)
-                    self.present(alert, animated: true)
+                    self.presentAlert(title: "Ошибка", message: error)
                 }
             }
         }

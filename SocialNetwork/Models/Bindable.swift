@@ -8,7 +8,6 @@
 class Bindable<T> {
     var value: T? {
         didSet {
-            print("didSet")
             handlers.forEach{ handler in
                 handler(value)
             }
