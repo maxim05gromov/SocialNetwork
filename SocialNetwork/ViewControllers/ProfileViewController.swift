@@ -8,7 +8,6 @@
 import UIKit
 import SnapKit
 class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-    
     var user: User?
     var editMode = false
     
@@ -22,8 +21,6 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
         
         navigationItem.title = "Профиль"
         navigationController?.navigationBar.prefersLargeTitles = true
-//        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(edit))
-        
         view.addSubview(tableView)
         
         tableView.delegate = self
@@ -35,17 +32,13 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
         tableView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        
-        
         if editMode {
             refreshControl.addTarget(self, action: #selector(self.refresh(_:)), for: .valueChanged)
             tableView.addSubview(refreshControl)
             Model.shared.posts.bind { _ in
-                DispatchQueue.main.async {
                     self.activityIndicator.stopAnimating()
                     self.tableView.reloadData()
                     self.refreshControl.endRefreshing()
-                }
             }
             
             Model.shared.loadPosts {
@@ -65,11 +58,7 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
         
     }
     @objc func refresh(_ sender: Any) {
-        Model.shared.loadPosts {
-            DispatchQueue.main.async {
-                print("Posts loaded")
-            }
-        } onError: { error in
+        Model.shared.loadPosts {} onError: { error in
             self.presentAlert(title: "Ошибка", message: error)
         }
 

@@ -14,14 +14,6 @@ class ConversationTableViewCell: UITableViewCell {
     lazy var vstack = UIStackView(arrangedSubviews: [nameLabel, lastMessageLabel])
     lazy var hstack = UIStackView(arrangedSubviews: [avatarImageView, vstack])
     
-    override func awakeFromNib() {
-        super.awakeFromNib()
-    }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-    }
-    
     func configure(conversation: Conversation){
         addSubview(hstack)
         hstack.snp.makeConstraints { make in
@@ -30,7 +22,7 @@ class ConversationTableViewCell: UITableViewCell {
         hstack.spacing = 10
         vstack.axis = .vertical
         avatarImageView.image = UIImage(systemName: "person")
-        avatarImageView.backgroundColor = .red
+        avatarImageView.backgroundColor = .systemGray
         avatarImageView.snp.makeConstraints { make in
             make.width.height.equalTo(50)
         }

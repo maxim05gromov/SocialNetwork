@@ -107,11 +107,9 @@ class MainViewController: UIViewController {
         Model.shared.loadProfile { _ in
             self.showTabBarController()
         } onError: { _ in
-            DispatchQueue.main.async {
-                self.stackView.isHidden = false
-                self.activityIndicator.stopAnimating()
-                self.activityIndicator.isHidden = true
-            }
+            self.stackView.isHidden = false
+            self.activityIndicator.stopAnimating()
+            self.activityIndicator.isHidden = true
         }
         
         view.addSubview(stackView)
@@ -182,8 +180,6 @@ class MainViewController: UIViewController {
             make.top.equalTo(nameTextField.snp.bottom).offset(5)
         }
         
-        
-        
         view.addSubview(activityIndicator)
         activityIndicator.snp.makeConstraints { make in
             make.center.equalToSuperview()
@@ -215,33 +211,24 @@ class MainViewController: UIViewController {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "dd.MM.yyyy"
             let formattedDate = dateFormatter.string(from: date)
-
+            
             Model.shared.register(name: name, secondName: secondName, username: username, password: password, dateOfBirth: formattedDate, gender: gender) {
                 self.showTabBarController()
             } onError: { error in
-                DispatchQueue.main.async{
-                    self.presentAlert(title: "Ошибка", message: error)
-                }
+                self.presentAlert(title: "Ошибка", message: error)
             }
-
-            
-            
         }else{
             activityIndicator.isHidden = false
             activityIndicator.startAnimating()
             stackView.isHidden = true
             
             Model.shared.login(username: username, password: password) {
-                DispatchQueue.main.async{
-                    self.activityIndicator.stopAnimating()
-                    self.showTabBarController()
-                }
+                self.activityIndicator.stopAnimating()
+                self.showTabBarController()
             } onError: { error in
-                DispatchQueue.main.async{
-                    self.activityIndicator.stopAnimating()
-                    self.stackView.isHidden = false
-                    self.presentAlert(title: "Ошибка", message: error)
-                }
+                self.activityIndicator.stopAnimating()
+                self.stackView.isHidden = false
+                self.presentAlert(title: "Ошибка", message: error)
             }
         }
     }

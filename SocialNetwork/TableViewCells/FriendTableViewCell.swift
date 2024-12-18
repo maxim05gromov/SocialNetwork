@@ -8,17 +8,9 @@
 import UIKit
 import SnapKit
 class FriendTableViewCell: UITableViewCell {
-    
     lazy var nameLabel = UILabel()
     lazy var avatarImageView = UIImageView()
     lazy var hstack = UIStackView(arrangedSubviews: [avatarImageView, nameLabel])
-    override func awakeFromNib() {
-        super.awakeFromNib()
-    }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-    }
     
     func configure(user: User){
         addSubview(hstack)
@@ -27,7 +19,7 @@ class FriendTableViewCell: UITableViewCell {
         }
         hstack.spacing = 10
         avatarImageView.image = UIImage(systemName: "person")
-        avatarImageView.backgroundColor = .red
+        avatarImageView.backgroundColor = .systemGray
         avatarImageView.snp.makeConstraints { make in
             make.width.height.equalTo(50)
         }

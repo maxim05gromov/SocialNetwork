@@ -19,9 +19,3 @@ class Post: Codable, Identifiable {
         self.timestamp = timestamp
     }
 }
-//struct Comment: Codable, Identifiable {
-//    let id: Int
-//    let userID: Int
-//    let text: String
-//    let timestamp: Date
-//}

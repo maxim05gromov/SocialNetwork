@@ -19,7 +19,6 @@ class Model {
     
     private var sessionID: String?
     
-    
     enum Method: String {
         case get = "GET"
         case post = "POST"
@@ -60,7 +59,6 @@ class Model {
             onError("Invalid URL")
             return
         }
-        
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
         if let body {
@@ -70,22 +68,32 @@ class Model {
         }
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error {
-                onError("\(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    onError("\(error.localizedDescription)")
+                }
                 return
             }
             guard let response = response as? HTTPURLResponse else {
-                onError("Cannot get response")
+                DispatchQueue.main.async {
+                    onError("Cannot get response")
+                }
                 return
             }
             guard let data else {
-                onError("Cannot decode data")
+                DispatchQueue.main.async {
+                    onError("Cannot decode data")
+                }
                 return
             }
             if response.statusCode != 200 {
                 let errorMessage = String(data: data, encoding: .utf8)
-                onError(errorMessage ?? "Unknown error")
+                DispatchQueue.main.async {
+                    onError(errorMessage ?? "Unknown error")
+                }
             }else{
-                completionHandler(data)
+                DispatchQueue.main.async {
+                    completionHandler(data)
+                }
             }
         }.resume()
     }
@@ -116,11 +124,10 @@ class Model {
         }
     }
     
-    func getUser(id: Int, completionHandler: @escaping(String) -> ()){
-        
-    }
-    
-    func login(username: String, password: String, completionHandler: @escaping() -> (), onError: @escaping(String) -> ()) {
+    func login(username: String,
+               password: String,
+               completionHandler: @escaping() -> (),
+               onError: @escaping(String) -> ()) {
         let arguments: [String: Any] = [
             "username": username,
             "password": password
@@ -130,18 +137,10 @@ class Model {
             UserDefaults.standard.set(self.sessionID, forKey: "sessionID")
             self.loadProfile { _ in
                 completionHandler()
-            } onError: { _ in
-                
-            }
-
-            
+            } onError: { _ in }
         } onError: { error in
             onError(error)
         }
-    }
-    
-    func loadAvatar(source: URL, completionHandler: @escaping(Data?) -> ()) {
-        
     }
     
     func loadNews(completionHandler: @escaping() -> (), onError: @escaping(String) -> ()) {
@@ -192,7 +191,14 @@ class Model {
         UserDefaults.standard.removeObject(forKey: "sessionID")
     }
     
-    func register(name: String, secondName: String, username: String, password: String, dateOfBirth: String, gender: Int, completionHandler: @escaping() -> (), onError: @escaping(String) -> ()){
+    func register(name: String,
+                  secondName: String,
+                  username: String,
+                  password: String,
+                  dateOfBirth: String,
+                  gender: Int,
+                  completionHandler: @escaping() -> (),
+                  onError: @escaping(String) -> ()){
         let body: [String: Any] = [
             "name": name,
             "second_name": secondName,
@@ -207,10 +213,7 @@ class Model {
             UserDefaults.standard.set(self.sessionID, forKey: "sessionID")
             self.loadProfile { _ in
                 completionHandler()
-            } onError: { _ in
-                
-            }
-            
+            } onError: { _ in }
         } onError: { error in
             onError(error)
         }
@@ -232,18 +235,16 @@ class Model {
     func newPost(text: String, completionHandler: @escaping() -> (), onError: @escaping(String) -> ()){
         request(endpoint: "new_post", method: .post, sessionKey: true, arguments: ["text": text]) { data in
             completionHandler()
-            self.loadPosts {
-                
-            } onError: { _ in
-                
-            }
-
+            self.loadPosts {} onError: { _ in }
         } onError: { error in
             onError(error)
         }
     }
     
-    func newMessage(text: String, convID: Int, completionHandler: @escaping(Conversation) -> (), onError: @escaping(String) -> ()){
+    func newMessage(text: String,
+                    convID: Int,
+                    completionHandler: @escaping(Conversation) -> (),
+                    onError: @escaping(String) -> ()){
         request(endpoint: "new_message", method: .post, sessionKey: true, arguments: [
             "conv_id": convID,
             "text": text]
@@ -254,13 +255,7 @@ class Model {
             }catch let error{
                 onError(error.localizedDescription)
             }
-            
-            self.loadConversations {
-                
-            } onError: { _ in
-                
-            }
-
+            self.loadConversations {} onError: { _ in }
         } onError: { error in
             onError(error)
         }

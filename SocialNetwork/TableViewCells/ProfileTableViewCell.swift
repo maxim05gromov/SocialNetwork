@@ -8,7 +8,6 @@
 import UIKit
 import SnapKit
 class ProfileTableViewCell: UITableViewCell {
-    
     lazy var profileImageView = UIImageView()
     lazy var nameLabel = UILabel()
     lazy var divider = UIView()
@@ -51,7 +50,7 @@ class ProfileTableViewCell: UITableViewCell {
         }
         profileImageView.image = UIImage(systemName: "person")
         profileImageView.contentMode = .scaleAspectFill
-        profileImageView.backgroundColor = .red
+        profileImageView.backgroundColor = .systemGray
         profileImageView.snp.makeConstraints { make in
             make.width.height.equalTo(80)
         }

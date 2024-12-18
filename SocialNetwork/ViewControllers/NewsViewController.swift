@@ -8,7 +8,6 @@
 import UIKit
 import SnapKit
 class NewsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-    
     lazy var tableView = UITableView(frame: CGRect.null, style: .insetGrouped)
     lazy var buttonView = UIButton()
     lazy var noPostsLabel = UILabel()
@@ -47,28 +46,18 @@ class NewsViewController: UIViewController, UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         return UIView()
     }
-    //    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    //        tableView.deselectRow(at: indexPath, animated: true)
-    //        let cell = tableView.cellForRow(at: indexPath) as? PostTableViewCell
-    //        guard let cell else { return }
-    //        cell.clicked()
-    //        tableView.reloadRows(at: [indexPath], with: .fade)
-    //    }
     override func viewDidLoad() {
         super.viewDidLoad()
         
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.title = "Новости"
         
-        
-        
-        
         Model.shared.loadNews {
             print("News loaded")
         } onError: { error in
             self.presentAlert(title: "Ошибка", message: error)
         }
-
+        
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(PostTableViewCell.self, forCellReuseIdentifier: "Post")
@@ -82,11 +71,9 @@ class NewsViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         
         Model.shared.news.bind { _ in
-            DispatchQueue.main.async {
-                self.activityIndicator.stopAnimating()
-                self.tableView.reloadData()
-                self.refreshControl.endRefreshing()
-            }
+            self.activityIndicator.stopAnimating()
+            self.tableView.reloadData()
+            self.refreshControl.endRefreshing()
         }
         
         noPostsLabel.text = "Новостей нет"
@@ -114,9 +101,7 @@ class NewsViewController: UIViewController, UITableViewDelegate, UITableViewData
         } onError: { error in
             self.presentAlert(title: "Ошибка", message: error)
         }
-
     }
-    
 }
 
 #Preview{

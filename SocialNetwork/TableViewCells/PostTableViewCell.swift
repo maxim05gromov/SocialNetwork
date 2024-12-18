@@ -18,18 +18,6 @@ class PostTableViewCell: UITableViewCell {
     lazy var hstack = UIStackView(arrangedSubviews: [userAvatar, vstack])
     lazy var vstack = UIStackView(arrangedSubviews: [usernameLabel, dateLabel])
     lazy var stackView = UIStackView(arrangedSubviews: [hstack, contentTextLabel, watchFullLabel, image])
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
-    }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-    }
-//    func clicked(){
-//        print("clicked \(contentTextLabel.text)")
-//        contentTextLabel.numberOfLines = 0
-//    }
     func configure(post: Post) {
         addSubview(stackView)
         
@@ -47,14 +35,13 @@ class PostTableViewCell: UITableViewCell {
         }
         
         userAvatar.image = UIImage(systemName: "person")
-        userAvatar.backgroundColor = .red
+        userAvatar.backgroundColor = .systemGray
         userAvatar.layer.cornerRadius = 50 / 2
         userAvatar.clipsToBounds = true
         userAvatar.snp.makeConstraints { make in
             make.width.height.equalTo(50)
             make.leading.equalTo(hstack)
         }
-        
         
         usernameLabel.text = "\(post.user.name) \(post.user.second_name)"
         usernameLabel.font = .boldSystemFont(ofSize: 24)
@@ -65,33 +52,7 @@ class PostTableViewCell: UITableViewCell {
         contentTextLabel.font = .systemFont(ofSize: 20)
         contentTextLabel.text = post.text
         contentTextLabel.numberOfLines = 0
-        
-//        watchFullLabel.text = "Посмотреть полностью"
-//        watchFullLabel.font = .systemFont(ofSize: 16)
-//        watchFullLabel.textColor = .systemGray
-//        
-//        if contentTextLabel.calculateMaxLines() < 6 {
-//            watchFullLabel.isHidden = true
-//        }
-        
-//        if post.image != nil {
-//            image.image = UIImage(named: "test_image")
-//            image.backgroundColor = .red
-//            image.contentMode = .scaleAspectFit
-//            let koef: Double = image.image!.size.height / image.image!.size.width
-//            image.snp.makeConstraints { make in
-//                make.width.equalTo(hstack)
-//                make.height.equalTo(hstack.snp.width).multipliedBy(koef)
-//            }
-//            image.clipsToBounds = true
-//            image.isHidden = false
-//            image.layer.cornerRadius = 10
-//        }else{
-//            image.isHidden = true
-//        }
         image.isHidden = true
     }
-    
-    
 }
 

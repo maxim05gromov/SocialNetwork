@@ -29,19 +29,12 @@ class FriendsViewController: UIViewController, UITableViewDataSource, UITableVie
         }
         
         Model.shared.friends.bind { _ in
-            DispatchQueue.main.async {
-                self.activityIndicator.stopAnimating()
-                self.tableView.reloadData()
-            }
+            self.activityIndicator.stopAnimating()
+            self.tableView.reloadData()
         }
-        Model.shared.loadFriends {
-            print("loaded")
-        } onError: { error in
-            DispatchQueue.main.async {
-                self.presentAlert(title: "Ошибка", message: error)
-            }
+        Model.shared.loadFriends {} onError: { error in
+            self.presentAlert(title: "Ошибка", message: error)
         }
-
         
         view.addSubview(activityIndicator)
         activityIndicator.hidesWhenStopped = true
@@ -52,9 +45,7 @@ class FriendsViewController: UIViewController, UITableViewDataSource, UITableVie
         activityIndicator.startAnimating()
     }
     
-    @objc func addFriend() {
-        print("addFriend")
-    }
+    @objc func addFriend() {}
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return Model.shared.friends.value?.count ?? 0
@@ -80,7 +71,6 @@ class FriendsViewController: UIViewController, UITableViewDataSource, UITableVie
         vc.user = friend
         navigationController?.pushViewController(vc, animated: true)
     }
-    
 }
 
 #Preview {
